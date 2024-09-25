@@ -78,20 +78,23 @@ export class AppController {
     }
 
     @Get("search")
-    @Render("autRandForm")
-    autRandForm(@Query('searchTerm') searchTerm : string) 
+    @Render("search")
+    search(@Query('searchTerm') searchTerm : string) 
       {
-        
         //osszes quote a szerzotol
-        let qoutesfromauthor = new Array;
+        let quotesfromauthor = [];
         quotes.quotes.forEach(element => {
-          if (element.quote.includes == author) {
-            qoutesfromauthor.push(element.quote)
+          if (element.quote.includes(searchTerm)) {
+            quotesfromauthor.push(element.quote)
           }
         });
-        const randInt = Math.floor(Math.random()*qoutesfromauthor.length) 
+        if (quotesfromauthor.length == 0) {
+          return {message:["nincs ilyen uzent"]}
+        }
+        else{
+          return {message:quotesfromauthor}
+        }
 
-        return {message:qoutesfromauthor[randInt]}
       }
 
     @Get("authorRandomForm")
@@ -110,7 +113,22 @@ export class AppController {
 
         return {message:qoutesfromauthor[randInt]}
       }
-
+    
+    @Get("highlight/:id")
+    @Render("index")
+    highlight(@Query('SZOVEGRESZLET') SZOVEGRESZLET : string,@Param('id') id: string){
+      let qoutesfromauthor = new Array;
+      let idl = parseInt(id)
+        quotes.quotes.forEach(element => {
+          if (element.id == idl) {
+            qoutesfromauthor.push(element.quote)
+          }
+        });
+        const randInt = Math.floor(Math.random()*qoutesfromauthor.length) 
+        const regex = new RegExp(`(${SZOVEGRESZLET})`, 'gi');
+        return {message:qoutesfromauthor[0].replace(regex, '<strong>$1</strong>')}
+        return {message:qoutesfromauthor}
+    }
 
 
   
